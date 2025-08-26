@@ -2,6 +2,9 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages]
+find = { include = ["ruptura_zero"] }
+
 [project]
 name = "etl-ruptura-zero"
 version = "0.1.0"
@@ -11,7 +14,7 @@ authors = [
 description = "Análise de dados de vendas e estoque para identificar as causas da ruptura e gerar insights para otimização do negócio."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
 keywords = ["data analysis", "etl", "sales", "inventory", "business intelligence"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -22,7 +25,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Information Analysis",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
