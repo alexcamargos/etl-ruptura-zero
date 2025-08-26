@@ -31,9 +31,7 @@ __pycache__/
 # Dados e Relatórios
 output/
 reports/
-*.csv
-*.xlsx
-*.parquet
+~$*
 
 # Build e Distribuição
 build/
