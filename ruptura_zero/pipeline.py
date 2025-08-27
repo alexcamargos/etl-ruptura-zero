@@ -14,6 +14,7 @@
 # ------------------------------------------------------------------------------
 
 from loguru import logger
+from pandera.errors import SchemaError
 
 from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.transformer.cleaner import DataCleaner
@@ -26,7 +27,7 @@ class Pipeline:
     def __init__(self, extractor: ExcelExtractor, cleaner: DataCleaner) -> None:
         """Initialize the Pipeline."""
 
-        logger.info('Inicializando o Pipeline...')
+        logger.info("Initializing Pipeline...")
 
         # Set the extractor.
         self.extractor = extractor
@@ -42,7 +43,7 @@ class Pipeline:
     def extract_from_source(self) -> None:
         """Extract data from the source."""
 
-        logger.info('Extraindo dados da fonte...')
+        logger.info("Extracting data from source...")
 
         sheets = self.extractor.extract()
 
@@ -53,31 +54,50 @@ class Pipeline:
         if (self.ruptura_data is None or
                 self.vendas_data is None or
                 self.estoque_data is None):
-            logger.error('Erro ao extrair os dados. Verifique as planilhas e tente novamente.')
+            logger.error('Data extraction failed.')
 
     def clean_and_validate_data(self) -> None:
         """Clean and validate the data."""
 
-        logger.info('Limpando e validando todos os conjuntos de dados...')
+        logger.info("Cleaning and validating all datasets...")
 
-        for schema in DATA_CLEANING_SCHEMAS:
+        for data_cleaning_schema in DATA_CLEANING_SCHEMAS:
             # Obtendo o DataFrame correspondente ao esquema.
-            data_frame = getattr(self, schema['data_attr'])
+            data_frame = getattr(self, data_cleaning_schema['data_attr'])
             if data_frame is not None:
-                logger.info(f'Limpando dados de {schema["name"].lower()}...')
+                logger.info(
+                    f'Limpando dados de {data_cleaning_schema["name"].lower()}...')
                 # Aplicando a limpeza de dados.
-                cleaned_dataframe = self.cleaner.clean(data_frame, schema['types'])
+                cleaned_dataframe = self.cleaner.clean(
+                    data_frame, data_cleaning_schema['types'])
+
+                # Validação com Pandera.
+                pandera_schema = data_cleaning_schema.get('pandera_schema')
+                if not pandera_schema:
+                    logger.warning(
+                        f'Nenhum esquema Pandera encontrado para {data_cleaning_schema["name"]}. Pulando a validação.')
+                else:
+                    try:
+                        logger.info(f'Validando dados de {data_cleaning_schema["name"]} com Pandera...')
+                        pandera_schema.validate(cleaned_dataframe, lazy=True)
+                        logger.success(f'Validação de {data_cleaning_schema["name"]} bem-sucedida.')
+                    except SchemaError as error:
+                        logger.error(f'Validação de dados para {data_cleaning_schema["name"]} falhou.')
+                        logger.error(f'Causa do erro:\n{error.failure_cases}')
+                        raise error
+
                 # Atribuindo o DataFrame limpo de volta ao atributo da classe.
-                setattr(self, schema['data_attr'], cleaned_dataframe)
+                setattr(self, data_cleaning_schema['data_attr'], cleaned_dataframe)
             else:
-                logger.error(f'Dados de {schema["name"].lower()} não foram extraídos corretamente.')
+                logger.error(
+                    f'Dados de {data_cleaning_schema["name"].lower()} não foram extraídos corretamente.')
 
     def transform_for_analysis(self) -> None:
         """Transform the data for analysis."""
 
-        logger.info('Transformando dados para análise...')
+        logger.info("Transforming data for analysis...")
 
     def load_to_destination(self) -> None:
         """Load the data into the destination."""
 
-        logger.info('Carregando dados para o destino...')
+        logger.info("Loading data to destination...")
