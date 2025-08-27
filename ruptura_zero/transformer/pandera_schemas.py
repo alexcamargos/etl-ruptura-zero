@@ -33,6 +33,22 @@ RUPTURA_SCHEMA = pa.DataFrameSchema(
     ordered=True
 )
 
+# Esquema de validação para os dados de estoque.
+ESTOQUE_SCHEMA = pa.DataFrameSchema(
+    columns={
+        'dt_mes': pa.Column(int, nullable=False, coerce=True),
+        'cod_clien': pa.Column(str, nullable=False, coerce=True),
+        'vlr_volume_real': pa.Column(int, nullable=False, coerce=True),
+        'cidade': pa.Column(str, nullable=False, coerce=True),
+        'uf': pa.Column(str, nullable=False, coerce=True),
+        'pais': pa.Column(str, nullable=False, coerce=True),
+        'ano': pa.Column(int, nullable=False, coerce=True),
+        'mes': pa.Column(int, nullable=False, coerce=True),
+    },
+    strict=True,
+    ordered=True
+)
+
 # Esquema de validação para os dados de vendas.
 VENDAS_SCHEMA = pa.DataFrameSchema(
     columns={
@@ -45,22 +61,6 @@ VENDAS_SCHEMA = pa.DataFrameSchema(
         'cobertura_dias': pa.Column(int, nullable=False, coerce=True),
         'tipo_cliente': pa.Column(str, nullable=False, coerce=True),
         'contato_cliente': pa.Column(str, nullable=False, coerce=True),
-    },
-    strict=True,
-    ordered=True
-)
-
-# Esquema de validação para os dados de estoque.
-ESTOQUE_SCHEMA = pa.DataFrameSchema(
-    columns={
-        'dt_mes': pa.Column(pa.DateTime, nullable=False, coerce=True),
-        'cod_clien': pa.Column(str, nullable=False, coerce=True),
-        'vlr_volume_real': pa.Column(int, nullable=False, coerce=True),
-        'cidade': pa.Column(str, nullable=False, coerce=True),
-        'uf': pa.Column(str, nullable=False, coerce=True),
-        'pais': pa.Column(str, nullable=False, coerce=True),
-        'ano': pa.Column(int, nullable=False, coerce=True),
-        'mes': pa.Column(int, nullable=False, coerce=True),
     },
     strict=True,
     ordered=True

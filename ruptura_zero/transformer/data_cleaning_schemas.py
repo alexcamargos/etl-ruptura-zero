@@ -34,8 +34,8 @@ DATA_CLEANING_SCHEMAS = [
         'pandera_schema': RUPTURA_SCHEMA
     },
     {
-        'name': '02_BD_Vendas',
-        'data_attr': 'vendas_data',
+        'name': '02_BD_Estoque',
+        'data_attr': 'estoque_data',
         'types': {
             'mes': 'string',
             'cod_cliente': 'string',
@@ -50,8 +50,8 @@ DATA_CLEANING_SCHEMAS = [
         'pandera_schema': VENDAS_SCHEMA
     },
     {
-        'name': '03_BD_Estoque',
-        'data_attr': 'estoque_data',
+        'name': '03_BD_Vendas',
+        'data_attr': 'vendas_data',
         'types': {
             'dt_mes': 'date',
             'cod_clien': 'string',

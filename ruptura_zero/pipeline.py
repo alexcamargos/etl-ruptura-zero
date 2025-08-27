@@ -48,8 +48,8 @@ class Pipeline:
         sheets = self.extractor.extract()
 
         self.ruptura_data = sheets.get('01_BD_Ruptura')
-        self.vendas_data = sheets.get('02_BD_Estoque')
-        self.estoque_data = sheets.get('03_BD_Vendas')
+        self.estoque_data = sheets.get('02_BD_Estoque')
+        self.vendas_data = sheets.get('03_BD_Vendas')
 
         if (self.ruptura_data is None or
                 self.vendas_data is None or
