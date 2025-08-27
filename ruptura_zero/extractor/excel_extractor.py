@@ -44,7 +44,7 @@ class ExcelExtractor:
             xls = pd.ExcelFile(self.file_path)
             sheets = {str(sheet_name): xls.parse(sheet_name) for sheet_name in xls.sheet_names}
 
-            logger.info("All sheets extraction successful.")
+            logger.info(f"All sheets extraction successful: {list(sheets.keys())}")
 
             return sheets
         except Exception as error:
