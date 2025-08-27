@@ -65,6 +65,7 @@ class DataCleaner:
             data[column] = data[column].str.replace('R$', '', regex=False) \
                                        .str.replace('.', '', regex=False) \
                                        .str.replace(',', '.', regex=False)
+            data[column] = pd.to_numeric(data[column], errors='coerce')
 
         return data
 
@@ -134,6 +135,10 @@ class DataCleaner:
         # Normaliza os nomes das colunas.
         data = self._normalize_columns_names(data)
 
+        # Extrai o ano e o mês das colunas de data.
+        date_columns = [column for column, dtype in column_types.items() if dtype == 'date']
+        data = self._extract_year_and_month(data, date_columns)
+
         # Normaliza as colunas numéricas.
         numeric_columns = [column for column, dtype in column_types.items() if dtype == 'integer']
         data = self._normalize_numeric_columns(data, numeric_columns)
@@ -145,10 +150,6 @@ class DataCleaner:
         # Normaliza as colunas percentuais.
         percent_columns = [column for column, dtype in column_types.items() if dtype == 'percent']
         data = self._normalize_percent_columns(data, percent_columns)
-
-        # Extrai o ano e o mês das colunas de data.
-        date_columns = [column for column, dtype in column_types.items() if dtype == 'date']
-        data = self._extract_year_and_month(data, date_columns)
 
         # Remove valores duplicados.
         data = self._remove_duplicates(data)
