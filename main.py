@@ -19,6 +19,7 @@ from loguru import logger
 from ruptura_zero.manager import PipelineManager
 from ruptura_zero.pipeline import Pipeline
 from ruptura_zero.extractor.excel_extractor import ExcelExtractor
+from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.utilities.configurations import Config as Cfg
 
 
@@ -53,8 +54,11 @@ if __name__ == "__main__":
     # Create an ExcelExtractor instance.
     extractor = ExcelExtractor(Cfg.RAW_DATA.value / 'ruptura_database.xlsx')
 
+    # Create a DataCleaner instance.
+    cleaner = DataCleaner()
+
     # Create a Pipeline instance.
-    pipeline = Pipeline(extractor)
+    pipeline = Pipeline(extractor, cleaner)
 
     # Create a PipelineManager instance.
     pipeline_manager = PipelineManager(pipeline)
