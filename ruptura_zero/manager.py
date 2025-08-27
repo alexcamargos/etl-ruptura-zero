@@ -28,7 +28,7 @@ class PipelineManager:
             pipeline (Pipeline): The ETL pipeline instance.
         """
 
-        logger.info("Initializing PipelineManager...")
+        logger.info('Inicializando o Pipeline Manager...')
 
         self.pipeline = pipeline
 

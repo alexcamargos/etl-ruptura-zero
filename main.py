@@ -48,8 +48,8 @@ def main(pipeline_manager: PipelineManager) -> None:
 
 if __name__ == "__main__":
     # Starting the ETL process.
-    logger.info("Ruptura Zero: Análise de Vendas e Estoques...")
-    logger.info("Starting ETL process...")
+    logger.info('Ruptura Zero: Análise de Vendas e Estoques...')
+    logger.info('Iniciando o processo ETL...')
 
     # Create an ExcelExtractor instance.
     extractor = ExcelExtractor(Cfg.RAW_DATA.value / 'ruptura_database.xlsx')

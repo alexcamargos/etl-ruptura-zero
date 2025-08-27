@@ -38,17 +38,17 @@ class ExcelExtractor:
             dict[str, pd.DataFrame]: A dictionary with sheet names as keys and DataFrames as values.
         """
 
-        logger.info(f"Extracting all sheets from Excel file: {self.file_path}")
+        logger.info(f'Extraindo todas as planilhas do arquivo Excel: {self.file_path}')
 
         try:
             xls = pd.ExcelFile(self.file_path)
             sheets = {str(sheet_name): xls.parse(sheet_name) for sheet_name in xls.sheet_names}
 
-            logger.info(f"All sheets extraction successful: {list(sheets.keys())}")
+            logger.info(f'Extração de todas as planilhas bem-sucedida: {list(sheets.keys())}')
 
             return sheets
         except Exception as error:
-            logger.error(f"Error extracting all sheets from Excel file: {error}")
+            logger.error(f'Erro ao extrair todas as planilhas do arquivo Excel: {error}')
 
             return {}
 
