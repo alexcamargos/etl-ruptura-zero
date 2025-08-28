@@ -69,6 +69,14 @@ class DataCleaner:
 
         return data
 
+    def _normalize_month_code_columns(self, data: pd.DataFrame, month_code_columns: list) -> pd.DataFrame:
+
+        for column in month_code_columns:
+            data['mes'] = data[column].astype(str).str[-2:] \
+                                      .astype(int)
+
+        return data
+
     def _remove_duplicates(self, data: pd.DataFrame) -> pd.DataFrame:
         """Remove duplicate rows from the data.
 
@@ -120,6 +128,9 @@ class DataCleaner:
         # Extrai o ano e o mês das colunas de data.
         date_columns = [column for column, dtype in column_types.items() if dtype == 'data-base']
         data = self._extract_year_and_month(data, date_columns)
+
+        month_code_columns = [column for column, dtype in column_types.items() if dtype == 'month_code']
+        data = self._normalize_month_code_columns(data, month_code_columns)
 
         # Normaliza as colunas numéricas.
         numeric_columns = [column for column, dtype in column_types.items() if dtype == 'integer']
