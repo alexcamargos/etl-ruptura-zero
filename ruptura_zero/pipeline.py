@@ -155,7 +155,7 @@ class Pipeline:
 
             logger.success('Validação dos dados consolidados bem-sucedida.')
         except SchemaError as error:
-            logger.error(f'Validação de dados consolidados falhou.')
+            logger.error('Validação de dados consolidados falhou.')
             logger.error(f'Causa do erro:\n{error.failure_cases}')
 
             raise error
