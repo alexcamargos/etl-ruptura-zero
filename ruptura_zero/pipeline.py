@@ -28,7 +28,7 @@ class Pipeline:
     def __init__(self, extractor: ExcelExtractor, cleaner: DataCleaner, merger: DataMerger) -> None:
         """Initialize the Pipeline."""
 
-        logger.info("Initializing Pipeline...")
+        logger.info('Inicializando o Pipeline...')
 
         # Set the extractor.
         self.extractor = extractor
@@ -49,7 +49,7 @@ class Pipeline:
     def extract_from_source(self) -> None:
         """Extract data from the source."""
 
-        logger.info("Extracting data from source...")
+        logger.info('Extraindo os dados brutos do Excel...')
 
         sheets = self.extractor.extract()
 
@@ -65,7 +65,7 @@ class Pipeline:
     def clean_and_validate_data(self) -> None:
         """Clean and validate the data."""
 
-        logger.info("Cleaning and validating all datasets...")
+        logger.info('Limpando e validando todos os conjuntos de dados...')
 
         for data_cleaning_schema in DATA_CLEANING_SCHEMAS:
             # Obtendo o DataFrame correspondente ao esquema.
@@ -107,7 +107,7 @@ class Pipeline:
     def transform_for_analysis(self) -> None:
         """Transform the data for analysis."""
 
-        logger.info("Transforming data for analysis...")
+        logger.info('Transformando os dados para análise...')
 
         # Consolida os dados de ruptura e estoque.
         ruptura_estoque_merged = self.merger.merge_data(data_frame_left=self.ruptura_data,
@@ -131,4 +131,4 @@ class Pipeline:
     def load_to_destination(self) -> None:
         """Load the data into the destination."""
 
-        logger.info("Loading data to destination...")
+        logger.info('Carregando os dados para o destino...')
