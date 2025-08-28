@@ -19,22 +19,6 @@ import pandas as pd
 class DataCleaner:
     """Cleans and preprocesses data for analysis."""
 
-    def _normalize_columns_names(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Normalize column names by stripping whitespace and converting to lowercase.
-
-        Args:
-            data (pd.DataFrame): The data to normalize column names for.
-
-        Returns:
-            pd.DataFrame: The data with normalized column names.
-        """
-
-        data.columns = data.columns.str.strip() \
-                                   .str.replace(' ', '_') \
-                                   .str.lower()
-
-        return data
-
     def _normalize_numeric_columns(self, data: pd.DataFrame, numeric_columns: list) -> pd.DataFrame:
         """Normalize numeric columns by converting them to a consistent format.
 
@@ -132,11 +116,9 @@ class DataCleaner:
         Returns:
             pd.DataFrame: The cleaned data.
         """
-        # Normaliza os nomes das colunas.
-        data = self._normalize_columns_names(data)
 
         # Extrai o ano e o mês das colunas de data.
-        date_columns = [column for column, dtype in column_types.items() if dtype == 'date']
+        date_columns = [column for column, dtype in column_types.items() if dtype == 'data-base']
         data = self._extract_year_and_month(data, date_columns)
 
         # Normaliza as colunas numéricas.
