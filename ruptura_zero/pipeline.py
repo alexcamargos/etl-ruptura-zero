@@ -43,6 +43,8 @@ class Pipeline:
         self.ruptura_data = None
         self.vendas_data = None
         self.estoque_data = None
+        self.ruptura_estoque_data = None
+        self.ruptura_estoque_vendas_data = None
 
     def extract_from_source(self) -> None:
         """Extract data from the source."""
@@ -107,14 +109,24 @@ class Pipeline:
 
         logger.info("Transforming data for analysis...")
 
-        self.merger.merge_data(
-            data_frame_left=self.ruptura_data,
-            data_frame_right=self.estoque_data,
-            left_key=['mes', 'cliente_id', 'categoria_material'],
-            right_key=['mes', 'cliente_id', 'categoria_material'],
-            how='inner',
-            suffixes=('_ruptura', '_estoque')
-        )
+        # Consolida os dados de ruptura e estoque.
+        ruptura_estoque_merged = self.merger.merge_data(data_frame_left=self.ruptura_data,
+                                                        data_frame_right=self.estoque_data,
+                                                        left_key=['mes', 'cliente_id', 'categoria_material'],
+                                                        right_key=['mes', 'cliente_id', 'categoria_material'],
+                                                        how='inner',
+                                                        suffixes=('_ruptura', '_estoque'))
+        self.ruptura_estoque_data = ruptura_estoque_merged
+
+        # Consolida os dados de ruptura, estoque e vendas.
+        ruptura_estoque_vendas = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
+                                                        data_frame_right=self.vendas_data,
+                                                        left_key=['mes', 'cliente_id'],
+                                                        right_key=['mes', 'cliente_id'],
+                                                        how='inner',
+                                                        suffixes=('_ruptura_estoque', '_vendas'))
+        self.ruptura_estoque_vendas_data = ruptura_estoque_vendas
+
 
     def load_to_destination(self) -> None:
         """Load the data into the destination."""
