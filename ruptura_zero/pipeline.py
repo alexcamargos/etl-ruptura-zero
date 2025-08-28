@@ -19,12 +19,13 @@ from pandera.errors import SchemaError
 from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
+from ruptura_zero.transformer.data_merge import DataMerger
 
 
 class Pipeline:
     """Defines the ETL pipeline for the Ruptura Zero project."""
 
-    def __init__(self, extractor: ExcelExtractor, cleaner: DataCleaner) -> None:
+    def __init__(self, extractor: ExcelExtractor, cleaner: DataCleaner, merger: DataMerger) -> None:
         """Initialize the Pipeline."""
 
         logger.info("Initializing Pipeline...")
@@ -34,6 +35,9 @@ class Pipeline:
 
         # Set the cleaner.
         self.cleaner = cleaner
+
+        # Set the merger.
+        self.merger = merger
 
         # Initialize data attributes.
         self.ruptura_data = None
@@ -64,14 +68,19 @@ class Pipeline:
         for data_cleaning_schema in DATA_CLEANING_SCHEMAS:
             # Obtendo o DataFrame correspondente ao esquema.
             data_frame = getattr(self, data_cleaning_schema['data_attr'])
-            if data_frame is not None:
-                logger.info(
-                    f'Limpando dados de {data_cleaning_schema["name"].lower()}...')
-                # Aplicando a limpeza de dados.
-                cleaned_dataframe = self.cleaner.clean(
-                    data_frame, data_cleaning_schema['types'])
 
-                # Validação com Pandera.
+            if data_frame is not None:
+                # Renomear colunas com base no esquema.
+                columns_mapping = data_cleaning_schema.get('columns')
+                if columns_mapping:
+                    logger.info(f'Renomeando colunas de {data_cleaning_schema["name"]}...')
+                    data_frame = data_frame.rename(columns=columns_mapping)
+
+                # Aplicando a limpeza de dados.
+                logger.info(f'Limpando dados de {data_cleaning_schema["name"]}...')
+                cleaned_dataframe = self.cleaner.clean(data_frame, data_cleaning_schema['types'])
+
+                # Validação de dados com Pandera.
                 pandera_schema = data_cleaning_schema.get('pandera_schema')
                 if not pandera_schema:
                     logger.warning(
@@ -84,6 +93,7 @@ class Pipeline:
                     except SchemaError as error:
                         logger.error(f'Validação de dados para {data_cleaning_schema["name"]} falhou.')
                         logger.error(f'Causa do erro:\n{error.failure_cases}')
+
                         raise error
 
                 # Atribuindo o DataFrame limpo de volta ao atributo da classe.
