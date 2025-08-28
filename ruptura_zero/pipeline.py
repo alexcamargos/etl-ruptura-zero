@@ -20,15 +20,24 @@ from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
 from ruptura_zero.transformer.data_merge import DataMerger
+from ruptura_zero.utilities.configurations import Config as Cfg
+from ruptura_zero.utilities.data_persistence import DataPersistence
 
 
 class Pipeline:
     """Defines the ETL pipeline for the Ruptura Zero project."""
 
-    def __init__(self, extractor: ExcelExtractor, cleaner: DataCleaner, merger: DataMerger) -> None:
+    def __init__(self,
+                 extractor: ExcelExtractor,
+                 cleaner: DataCleaner,
+                 merger: DataMerger,
+                 data_persistence: DataPersistence) -> None:
         """Initialize the Pipeline."""
 
         logger.info('Inicializando o Pipeline...')
+
+        # Set the data persistence.
+        self.data_persistence = data_persistence
 
         # Set the extractor.
         self.extractor = extractor
@@ -112,6 +121,10 @@ class Pipeline:
                                                         how='inner',
                                                         suffixes=('_ruptura', '_estoque'))
         self.ruptura_estoque_data = ruptura_estoque_merged
+        # Persistindo os dados consolidados.
+        self.data_persistence.save_data(ruptura_estoque_merged,
+                                        Cfg.RAW_DATA.value / 'ruptura_estoque.csv',
+                                        {'sep': ';', 'encoding': 'utf-8'})
 
         # Consolida os dados de ruptura, estoque e vendas.
         ruptura_estoque_vendas = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
@@ -121,6 +134,10 @@ class Pipeline:
                                                         how='inner',
                                                         suffixes=('_ruptura_estoque', '_vendas'))
         self.ruptura_estoque_vendas_data = ruptura_estoque_vendas
+        # Persistindo os dados consolidados.
+        self.data_persistence.save_data(ruptura_estoque_vendas,
+                                        Cfg.RAW_DATA.value / 'ruptura_estoque_vendas.csv',
+                                        {'sep': ';', 'encoding': 'utf-8'})
 
     def load_to_destination(self) -> None:
         """Load the data into the destination."""

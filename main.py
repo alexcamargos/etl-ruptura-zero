@@ -16,12 +16,13 @@
 
 from loguru import logger
 
+from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.manager import PipelineManager
 from ruptura_zero.pipeline import Pipeline
-from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.transformer.data_merge import DataMerger
 from ruptura_zero.utilities.configurations import Config as Cfg
+from ruptura_zero.utilities.data_persistence import DataPersistence
 
 
 def main(pipeline_manager: PipelineManager) -> None:
@@ -61,8 +62,11 @@ if __name__ == "__main__":
     # Create a DataMerger instance.
     merger = DataMerger()
 
+    # Create a DataPersistence instance.
+    data_persistence = DataPersistence()
+
     # Create a Pipeline instance.
-    pipeline = Pipeline(extractor, cleaner, merger)
+    pipeline = Pipeline(extractor, cleaner, merger, data_persistence)
 
     # Create a PipelineManager instance.
     pipeline_manager = PipelineManager(pipeline)
