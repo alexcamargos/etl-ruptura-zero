@@ -123,20 +123,30 @@ class Pipeline:
         self.ruptura_estoque_data = ruptura_estoque_merged
         # Persistindo os dados consolidados.
         self.data_persistence.save_data(ruptura_estoque_merged,
-                                        Cfg.RAW_DATA.value / 'ruptura_estoque.csv',
+                                        Cfg.PROCESSED_DATA.value / 'ruptura_estoque.csv',
                                         {'sep': ';', 'encoding': 'utf-8'})
 
         # Consolida os dados de ruptura, estoque e vendas.
-        ruptura_estoque_vendas = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
-                                                        data_frame_right=self.vendas_data,
-                                                        left_key=['mes', 'cliente_id'],
-                                                        right_key=['mes', 'cliente_id'],
-                                                        how='inner',
-                                                        suffixes=('_ruptura_estoque', '_vendas'))
-        self.ruptura_estoque_vendas_data = ruptura_estoque_vendas
+        ruptura_estoque_vendas_merged = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
+                                                               data_frame_right=self.vendas_data,
+                                                               left_key=[
+                                                                   'mes', 'cliente_id'],
+                                                               right_key=[
+                                                                   'mes', 'cliente_id'],
+                                                               how='inner',
+                                                               suffixes=('_ruptura_estoque', '_vendas'))
+        # Removendo colunas desnecessárias.
+        ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.drop(columns=['cod_mes',
+                                                                                    'ano_ruptura_estoque',
+                                                                                    'data_base_ruptura_estoque',
+                                                                                    'descricao_cliente'])
+        # Renomeando colunas para padronização.
+        ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.rename(columns={'data_base_vendas': 'data_base',
+                                                                                      'ano_vendas': 'ano'})
+        self.ruptura_estoque_vendas_data = ruptura_estoque_vendas_merged
         # Persistindo os dados consolidados.
-        self.data_persistence.save_data(ruptura_estoque_vendas,
-                                        Cfg.RAW_DATA.value / 'ruptura_estoque_vendas.csv',
+        self.data_persistence.save_data(ruptura_estoque_vendas_merged,
+                                        Cfg.PROCESSED_DATA.value / 'ruptura_estoque_vendas.csv',
                                         {'sep': ';', 'encoding': 'utf-8'})
 
     def load_to_destination(self) -> None:
