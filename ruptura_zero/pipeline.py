@@ -57,11 +57,6 @@ class Pipeline:
         self.estoque_data = sheets.get('02_BD_Estoque')
         self.vendas_data = sheets.get('03_BD_Vendas')
 
-        if (self.ruptura_data is None or
-                self.vendas_data is None or
-                self.estoque_data is None):
-            logger.error('Data extraction failed.')
-
     def clean_and_validate_data(self) -> None:
         """Clean and validate the data."""
 
@@ -126,7 +121,6 @@ class Pipeline:
                                                         how='inner',
                                                         suffixes=('_ruptura_estoque', '_vendas'))
         self.ruptura_estoque_vendas_data = ruptura_estoque_vendas
-
 
     def load_to_destination(self) -> None:
         """Load the data into the destination."""
