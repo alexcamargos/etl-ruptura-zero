@@ -107,6 +107,15 @@ class Pipeline:
 
         logger.info("Transforming data for analysis...")
 
+        self.merger.merge_data(
+            data_frame_left=self.ruptura_data,
+            data_frame_right=self.estoque_data,
+            left_key=['mes', 'cliente_id', 'categoria_material'],
+            right_key=['mes', 'cliente_id', 'categoria_material'],
+            how='inner',
+            suffixes=('_ruptura', '_estoque')
+        )
+
     def load_to_destination(self) -> None:
         """Load the data into the destination."""
 

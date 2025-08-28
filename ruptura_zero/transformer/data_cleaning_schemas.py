@@ -47,7 +47,7 @@ DATA_CLEANING_SCHEMAS = [
         'name': '02_BD_Estoque',
         'data_attr': 'estoque_data',
         'columns': {
-            'MES': 'mes',
+            'MES': 'cod_mes',
             'COD_CLIENTE': 'cliente_id',
             'NOME CLIENTE': 'nome_cliente',
             'DESCRICAO_CATEGORIA': 'categoria_material',
@@ -58,7 +58,7 @@ DATA_CLEANING_SCHEMAS = [
             'CONTATO CLIENTE': 'contato_cliente'
         },
         'types': {
-            'mes': 'string',
+            'cod_mes': 'month_code',
             'cliente_id': 'string',
             'nome_cliente': 'string',
             'categoria_material': 'string',

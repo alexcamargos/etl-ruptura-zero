@@ -36,7 +36,7 @@ RUPTURA_SCHEMA = pa.DataFrameSchema(
 # Esquema de validação para os dados de estoque.
 ESTOQUE_SCHEMA = pa.DataFrameSchema(
     columns={
-        'mes': pa.Column(str, nullable=False, coerce=True),
+        'cod_mes': pa.Column(str, nullable=False, coerce=True),
         'cliente_id': pa.Column(str, nullable=False, coerce=True),
         'nome_cliente': pa.Column(str, nullable=False, coerce=True),
         'categoria_material': pa.Column(str, nullable=False, coerce=True),
@@ -45,6 +45,7 @@ ESTOQUE_SCHEMA = pa.DataFrameSchema(
         'cobertura_dias': pa.Column(int, nullable=False, coerce=True),
         'tipo_cliente': pa.Column(str, nullable=False, coerce=True),
         'contato_cliente': pa.Column(str, nullable=False, coerce=True),
+        'mes': pa.Column(int, nullable=False, coerce=True),
     },
     strict=True,
     ordered=True
