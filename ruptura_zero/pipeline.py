@@ -19,6 +19,7 @@ from pandera.errors import SchemaError
 from ruptura_zero.extractor.excel_extractor import ExcelExtractor
 from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
+from ruptura_zero.transformer.pandera_schemas import CONSOLIDATED_SCHEMA
 from ruptura_zero.transformer.data_merge import DataMerger
 from ruptura_zero.utilities.configurations import Config as Cfg
 from ruptura_zero.utilities.data_persistence import DataPersistence
@@ -144,6 +145,21 @@ class Pipeline:
         ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.rename(columns={'data_base_vendas': 'data_base',
                                                                                       'ano_vendas': 'ano'})
         self.ruptura_estoque_vendas_data = ruptura_estoque_vendas_merged
+
+        try:
+            logger.info('Validando os dados após a consolidação...')
+            # Validando o esquema dos dados consolidados.
+            expected_order = list(CONSOLIDATED_SCHEMA.columns.keys())
+            ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.loc[:, expected_order]
+            CONSOLIDATED_SCHEMA.validate(ruptura_estoque_vendas_merged, lazy=True)
+
+            logger.success('Validação dos dados consolidados bem-sucedida.')
+        except SchemaError as error:
+            logger.error(f'Validação de dados consolidados falhou.')
+            logger.error(f'Causa do erro:\n{error.failure_cases}')
+
+            raise error
+
         # Persistindo os dados consolidados.
         self.data_persistence.save_data(ruptura_estoque_vendas_merged,
                                         Cfg.PROCESSED_DATA.value / 'ruptura_estoque_vendas.csv',
