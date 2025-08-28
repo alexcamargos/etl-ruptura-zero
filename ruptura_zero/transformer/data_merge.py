@@ -16,6 +16,7 @@
 from typing import Literal
 
 import pandas as pd
+from loguru import logger
 
 
 class DataMerger:
@@ -41,6 +42,13 @@ class DataMerger:
         Returns:
             pd.DataFrame: The merged DataFrame.
         """
+
+        logger.info(
+            f'Consolidando os dados: {data_frame_left.shape[0]} linhas do lado esquerdo, '
+            f'{data_frame_right.shape[0]} linhas do lado direito')
+        logger.info(f'Usando chaves de junção: {left_key} (esquerda) e {right_key} (direita)')
+        logger.info(f'Tipo de merge: {how}')
+        logger.info(f'Sufixos aplicados: {suffixes}')
 
         return pd.merge(data_frame_left,
                         data_frame_right,
