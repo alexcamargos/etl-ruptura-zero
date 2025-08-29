@@ -20,6 +20,13 @@ from pathlib import Path
 class Config(Enum):
     """Configuration settings for project Ruptura Zero."""
 
+    RAW_DATA_FILE = 'ruptura_database.xlsx'
+    SHEET_RUPTURA = '01_BD_Ruptura'
+    SHEET_ESTOQUE = '02_BD_Estoque'
+    SHEET_VENDAS = '03_BD_Vendas'
+    RUPTURA_ESTOQUE_MERGED = 'ruptura_estoque.csv'
+    RUPTURA_ESTOQUE_VENDAS_MERGED = 'ruptura_estoque_vendas.csv'
+
     BASE_DIRECTORY = Path.cwd()
     LOG_DIRECTORY = BASE_DIRECTORY / 'logs'
     RAW_DATA = BASE_DIRECTORY / 'data' / 'raw'
