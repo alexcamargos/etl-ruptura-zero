@@ -35,7 +35,15 @@ class Pipeline:
                  merger: DataMerger,
                  loader: DataLoader,
                  data_persistence: DataPersistence) -> None:
-        """Initialize the Pipeline."""
+        """Initialize the Pipeline.
+
+        Args:
+            extractor (ExcelExtractor): The extractor instance.
+            cleaner (DataCleaner): The cleaner instance.
+            merger (DataMerger): The merger instance.
+            loader (DataLoader): The loader instance.
+            data_persistence (DataPersistence): The data persistence instance.
+        """
 
         logger.info('Inicializando o Pipeline...')
 
