@@ -24,6 +24,7 @@ from ruptura_zero.transformer.data_merge import DataMerger
 from ruptura_zero.transformer.pandera_schemas import CONSOLIDATED_SCHEMA
 from ruptura_zero.utilities.configurations import Config as Cfg
 from ruptura_zero.utilities.data_persistence import DataPersistence
+from ruptura_zero.utilities.merge_how_options import MergeHowOptions
 
 
 class Pipeline:
@@ -132,7 +133,7 @@ class Pipeline:
                                                         data_frame_right=self.estoque_data,
                                                         left_key=['mes', 'cliente_id', 'categoria_material'],
                                                         right_key=['mes', 'cliente_id', 'categoria_material'],
-                                                        how='inner',
+                                                        how=MergeHowOptions.INNER,
                                                         suffixes=('_ruptura', '_estoque'))
         self.ruptura_estoque_data = ruptura_estoque_merged
         # Persistindo os dados consolidados.
@@ -143,11 +144,9 @@ class Pipeline:
         # Consolida os dados de ruptura, estoque e vendas.
         ruptura_estoque_vendas_merged = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
                                                                data_frame_right=self.vendas_data,
-                                                               left_key=[
-                                                                   'mes', 'cliente_id'],
-                                                               right_key=[
-                                                                   'mes', 'cliente_id'],
-                                                               how='inner',
+                                                               left_key=['mes', 'cliente_id'],
+                                                               right_key=['mes', 'cliente_id'],
+                                                               how=MergeHowOptions.INNER,
                                                                suffixes=('_ruptura_estoque', '_vendas'))
         # Removendo colunas desnecessárias.
         ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.drop(columns=['cod_mes',
