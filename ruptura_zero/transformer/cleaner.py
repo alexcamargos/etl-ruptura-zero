@@ -63,6 +63,15 @@ class DataCleaner:
         return data
 
     def _normalize_percent_columns(self, data: pd.DataFrame, percent_columns: list) -> pd.DataFrame:
+        """Normalize percent columns by converting them to a consistent format.
+
+        Args:
+            data (pd.DataFrame): The data to normalize percent columns for.
+            percent_columns (list): The names of the percent columns to normalize.
+
+        Returns:
+            pd.DataFrame: The data with normalized percent columns.
+        """
 
         for column in percent_columns:
             data[column] = pd.to_numeric(data[column], errors='coerce')
@@ -70,6 +79,15 @@ class DataCleaner:
         return data
 
     def _normalize_month_code_columns(self, data: pd.DataFrame, month_code_columns: list) -> pd.DataFrame:
+        """Normalize month code columns by extracting the month from the code.
+
+        Args:
+            data (pd.DataFrame): The data to normalize month code columns for.
+            month_code_columns (list): The names of the month code columns to normalize.
+
+        Returns:
+            pd.DataFrame: The data with normalized month code columns.
+        """
 
         for column in month_code_columns:
             data['mes'] = data[column].astype(str).str[-2:] \
@@ -89,7 +107,7 @@ class DataCleaner:
 
         return data.drop_duplicates()
 
-    def _fill_missing_values(self, data: pd.DataFrame, strategy: str = "mean") -> pd.DataFrame:
+    def _fill_missing_values(self, data: pd.DataFrame, strategy: str = "mode") -> pd.DataFrame:
         """Fill missing values in the data.
 
         Args:
