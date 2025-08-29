@@ -16,6 +16,7 @@
 import pandera.pandas as pa
 
 from ruptura_zero.utilities.brazilian_states import BrazilianStates
+from ruptura_zero.utilities.client_type import ClientType
 
 # Esquema de validação para os dados de ruptura.
 RUPTURA_SCHEMA = pa.DataFrameSchema(
@@ -90,7 +91,7 @@ CONSOLIDATED_SCHEMA = pa.DataFrameSchema(
                                   nullable=False,
                                   description='Nome do cliente (ex: ESMERALDA, RUBI)'),
         'tipo_cliente': pa.Column(pa.String,
-                                  checks=pa.Check.isin(['ESPECIAL', 'PADRÃO']),
+                                  checks=pa.Check.isin(ClientType),
                                   nullable=False,
                                   description='Classificação do cliente'),
         'cidade': pa.Column(pa.String,
@@ -99,7 +100,7 @@ CONSOLIDATED_SCHEMA = pa.DataFrameSchema(
         'uf': pa.Column(pa.String,
                         nullable=False,
                         checks=[pa.Check.str_length(2, 2),
-                                pa.Check.isin([state.value for state in BrazilianStates])],
+                                pa.Check.isin(BrazilianStates)],
                         description='Unidade Federativa (UF) do cliente'),
         'pais': pa.Column(pa.String,
                           nullable=False,
