@@ -13,7 +13,7 @@
 #  License: MIT
 # ------------------------------------------------------------------------------
 
-from typing import Protocol
+from typing import Mapping, Protocol
 
 import pandas as pd
 
@@ -24,6 +24,13 @@ class DataCleanerProtocol(Protocol):
     """Protocol for data cleaners."""
 
     def clean(self, data: pd.DataFrame, column_types: dict) -> pd.DataFrame:
+        raise NotImplementedError('You should implement this method.')
+
+
+class DataCleaningServiceProtocol(Protocol):
+    """Protocol for data cleaning services."""
+
+    def run(self, extracted_data: Mapping[str, pd.DataFrame | None]) -> Mapping[str, pd.DataFrame]:
         raise NotImplementedError('You should implement this method.')
 
 
