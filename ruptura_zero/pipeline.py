@@ -13,6 +13,9 @@
 #  License: MIT
 # ------------------------------------------------------------------------------
 
+from typing import Mapping
+
+import pandas as pd
 from loguru import logger
 from pandera.errors import SchemaError
 
@@ -63,32 +66,30 @@ class Pipeline:
         # Set the loader.
         self.loader = loader
 
-        # Initialize data attributes.
-        self.ruptura_data = None
-        self.vendas_data = None
-        self.estoque_data = None
-        self.ruptura_estoque_data = None
-        self.ruptura_estoque_vendas_data = None
-
-    def extract_from_source(self) -> None:
+    def extract_from_source(self) -> Mapping[str, pd.DataFrame | None]:
         """Extract data from the source."""
 
         logger.info('Extraindo os dados brutos do Excel...')
 
         sheets = self.extractor.extract()
 
-        self.ruptura_data = sheets.get(Cfg.SHEET_RUPTURA.value)
-        self.estoque_data = sheets.get(Cfg.SHEET_ESTOQUE.value)
-        self.vendas_data = sheets.get(Cfg.SHEET_VENDAS.value)
+        extract_data = {'ruptura_data': sheets.get(Cfg.SHEET_RUPTURA.value),
+                        'estoque_data': sheets.get(Cfg.SHEET_ESTOQUE.value),
+                        'vendas_data': sheets.get(Cfg.SHEET_VENDAS.value)}
 
-    def clean_and_validate_data(self) -> None:
+        return extract_data
+
+    def clean_and_validate_data(self,
+                                extracted_data: Mapping[str, pd.DataFrame | None]
+                                ) -> Mapping[str, pd.DataFrame | None]:
         """Clean and validate the data."""
 
         logger.info('Limpando e validando todos os conjuntos de dados...')
 
+        cleaned_data = {}
         for data_cleaning_schema in DATA_CLEANING_SCHEMAS:
             # Obtendo o DataFrame correspondente ao esquema.
-            data_frame = getattr(self, data_cleaning_schema['data_attr'])
+            data_frame = extracted_data.get(data_cleaning_schema['data_attr'])
 
             if data_frame is not None:
                 # Renomear colunas com base no esquema.
@@ -118,24 +119,35 @@ class Pipeline:
                         raise error
 
                 # Atribuindo o DataFrame limpo de volta ao atributo da classe.
-                setattr(self, data_cleaning_schema['data_attr'], cleaned_dataframe)
+                cleaned_data[data_cleaning_schema['data_attr']] = cleaned_dataframe
             else:
                 logger.error(
                     f'Dados de {data_cleaning_schema["name"].lower()} não foram extraídos corretamente.')
 
-    def transform_for_analysis(self) -> None:
+        return cleaned_data
+
+    def transform_for_analysis(self,
+                               cleaned_data: Mapping[str, pd.DataFrame | None]
+                               ) -> pd.DataFrame | None:
         """Transform the data for analysis."""
 
         logger.info('Transformando os dados para análise...')
 
+        ruptura_data = cleaned_data.get('ruptura_data')
+        estoque_data = cleaned_data.get('estoque_data')
+        vendas_data = cleaned_data.get('vendas_data')
+
+        if ruptura_data is None or estoque_data is None or vendas_data is None:
+            logger.error('Dados de entrada para a transformação estão faltando. Abortando.')
+            return None
+
         # Consolida os dados de ruptura e estoque.
-        ruptura_estoque_merged = self.merger.merge_data(data_frame_left=self.ruptura_data,
-                                                        data_frame_right=self.estoque_data,
+        ruptura_estoque_merged = self.merger.merge_data(data_frame_left=ruptura_data,
+                                                        data_frame_right=estoque_data,
                                                         left_key=['mes', 'cliente_id', 'categoria_material'],
                                                         right_key=['mes', 'cliente_id', 'categoria_material'],
                                                         how=MergeHowOptions.INNER,
                                                         suffixes=('_ruptura', '_estoque'))
-        self.ruptura_estoque_data = ruptura_estoque_merged
         # Persistindo os dados consolidados.
         self.data_persistence.save_data(ruptura_estoque_merged,
                                         Cfg.PROCESSED_DATA.value / Cfg.RUPTURA_ESTOQUE_MERGED.value,
@@ -143,7 +155,7 @@ class Pipeline:
 
         # Consolida os dados de ruptura, estoque e vendas.
         ruptura_estoque_vendas_merged = self.merger.merge_data(data_frame_left=ruptura_estoque_merged,
-                                                               data_frame_right=self.vendas_data,
+                                                               data_frame_right=vendas_data,
                                                                left_key=['mes', 'cliente_id'],
                                                                right_key=['mes', 'cliente_id'],
                                                                how=MergeHowOptions.INNER,
@@ -156,7 +168,6 @@ class Pipeline:
         # Renomeando colunas para padronização.
         ruptura_estoque_vendas_merged = ruptura_estoque_vendas_merged.rename(columns={'data_base_vendas': 'data_base',
                                                                                       'ano_vendas': 'ano'})
-        self.ruptura_estoque_vendas_data = ruptura_estoque_vendas_merged
 
         try:
             logger.info('Validando os dados após a consolidação...')
@@ -176,11 +187,15 @@ class Pipeline:
         self.data_persistence.save_data(ruptura_estoque_vendas_merged,
                                         Cfg.PROCESSED_DATA.value / Cfg.RUPTURA_ESTOQUE_VENDAS_MERGED.value,
                                         {'sep': ';', 'encoding': 'utf-8'})
+        return ruptura_estoque_vendas_merged
 
-    def load_to_destination(self) -> None:
+    def load_to_destination(self, final_data: pd.DataFrame | None) -> None:
         """Load the data into the destination."""
 
         logger.info('Carregando os dados para o MotherDuck...')
 
-        # Carregando os dados consolidados para o MotherDuck.
-        self.loader.load_data(self.ruptura_estoque_vendas_data, to_motherduck=True)
+        if final_data is not None:
+            # Carregando os dados consolidados para o MotherDuck.
+            self.loader.load_data(final_data, to_motherduck=True)
+        else:
+            logger.warning('Nenhum dado final para carregar no MotherDuck.')

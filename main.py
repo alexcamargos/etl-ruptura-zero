@@ -36,17 +36,8 @@ def main(pipeline_manager: PipelineManager) -> None:
         pipeline_manager (PipelineManager): The pipeline manager instance.
     """
 
-    # Data extraction.
-    pipeline_manager.extractor()
-
-    # Data cleaning and validation.
-    pipeline_manager.cleaner()
-
-    # Data transformation.
-    pipeline_manager.transformer()
-
-    # Data loading.
-    pipeline_manager.loader()
+    # Run the ETL pipeline.
+    pipeline_manager.run_pipeline()
 
 
 if __name__ == "__main__":

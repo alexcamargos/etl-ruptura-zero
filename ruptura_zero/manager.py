@@ -32,22 +32,17 @@ class PipelineManager:
 
         self.pipeline = pipeline
 
-    def extractor(self) -> None:
-        """Run the extraction stage."""
+    def run_pipeline(self) -> None:
+        """Run the entire ETL pipeline."""
 
-        self.pipeline.extract_from_source()
+        # Extraindo os dados brutos.
+        raw_data = self.pipeline.extract_from_source()
 
-    def cleaner(self) -> None:
-        """Run the cleaning and validation stage."""
+        # Limpando e validando os dados.
+        cleaned_data = self.pipeline.clean_and_validate_data(raw_data)
 
-        self.pipeline.clean_and_validate_data()
+        # Transformando os dados para análise.
+        transformed_data = self.pipeline.transform_for_analysis(cleaned_data)
 
-    def transformer(self) -> None:
-        """Run the transformation stage."""
-
-        self.pipeline.transform_for_analysis()
-
-    def loader(self) -> None:
-        """Run the loading stage."""
-
-        self.pipeline.load_to_destination()
+        # Carregando os dados transformados.
+        self.pipeline.load_to_destination(transformed_data)
