@@ -13,11 +13,14 @@
 #  License: MIT
 # ------------------------------------------------------------------------------
 
-from ruptura_zero.transformer.pandera_schemas import ESTOQUE_SCHEMA, RUPTURA_SCHEMA, VENDAS_SCHEMA
+from ruptura_zero.transformer.pandera_schemas import (ESTOQUE_SCHEMA,
+                                                      RUPTURA_SCHEMA,
+                                                      VENDAS_SCHEMA)
+from ruptura_zero.utilities.configurations import Config as Cfg
 
 DATA_CLEANING_SCHEMAS = [
     {
-        'name': '01_BD_Ruptura',
+        'name': Cfg.SHEET_RUPTURA.value,
         'data_attr': 'ruptura_data',
         'columns': {
             'DT_MES': 'data_base',
@@ -44,7 +47,7 @@ DATA_CLEANING_SCHEMAS = [
         'pandera_schema': RUPTURA_SCHEMA
     },
     {
-        'name': '02_BD_Estoque',
+        'name': Cfg.SHEET_ESTOQUE.value,
         'data_attr': 'estoque_data',
         'columns': {
             'MES': 'cod_mes',
@@ -71,7 +74,7 @@ DATA_CLEANING_SCHEMAS = [
         'pandera_schema': ESTOQUE_SCHEMA
     },
     {
-        'name': '03_BD_Vendas',
+        'name': Cfg.SHEET_VENDAS.value,
         'data_attr': 'vendas_data',
         'columns': {
             'DT_MES': 'data_base',

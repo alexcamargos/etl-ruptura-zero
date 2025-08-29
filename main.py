@@ -55,7 +55,7 @@ if __name__ == "__main__":
     logger.info('Iniciando o processo ETL...')
 
     # Create an ExcelExtractor instance.
-    extractor = ExcelExtractor(Cfg.RAW_DATA.value / 'ruptura_database.xlsx')
+    extractor = ExcelExtractor(Cfg.RAW_DATA.value / Cfg.RAW_DATA_FILE.value)
 
     # Create a DataCleaner instance.
     cleaner = DataCleaner()

@@ -77,9 +77,9 @@ class Pipeline:
 
         sheets = self.extractor.extract()
 
-        self.ruptura_data = sheets.get('01_BD_Ruptura')
-        self.estoque_data = sheets.get('02_BD_Estoque')
-        self.vendas_data = sheets.get('03_BD_Vendas')
+        self.ruptura_data = sheets.get(Cfg.SHEET_RUPTURA.value)
+        self.estoque_data = sheets.get(Cfg.SHEET_ESTOQUE.value)
+        self.vendas_data = sheets.get(Cfg.SHEET_VENDAS.value)
 
     def clean_and_validate_data(self) -> None:
         """Clean and validate the data."""
@@ -138,7 +138,7 @@ class Pipeline:
         self.ruptura_estoque_data = ruptura_estoque_merged
         # Persistindo os dados consolidados.
         self.data_persistence.save_data(ruptura_estoque_merged,
-                                        Cfg.PROCESSED_DATA.value / 'ruptura_estoque.csv',
+                                        Cfg.PROCESSED_DATA.value / Cfg.RUPTURA_ESTOQUE_MERGED.value,
                                         {'sep': ';', 'encoding': 'utf-8'})
 
         # Consolida os dados de ruptura, estoque e vendas.
@@ -174,7 +174,7 @@ class Pipeline:
 
         # Persistindo os dados consolidados.
         self.data_persistence.save_data(ruptura_estoque_vendas_merged,
-                                        Cfg.PROCESSED_DATA.value / 'ruptura_estoque_vendas.csv',
+                                        Cfg.PROCESSED_DATA.value / Cfg.RUPTURA_ESTOQUE_VENDAS_MERGED.value,
                                         {'sep': ';', 'encoding': 'utf-8'})
 
     def load_to_destination(self) -> None:
