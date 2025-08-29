@@ -22,12 +22,12 @@ from pandera.errors import SchemaError
 from ruptura_zero.protocols.data_persistence import DataPersistenceProtocol
 from ruptura_zero.protocols.extractor import ExtractorProtocol
 from ruptura_zero.protocols.loader import LoaderProtocol
-from ruptura_zero.protocols.transformer import (DataCleanerProtocol,
-                                                DataMergerProtocol)
+from ruptura_zero.protocols.transformer import DataMergerProtocol
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
 from ruptura_zero.transformer.pandera_schemas import CONSOLIDATED_SCHEMA
 from ruptura_zero.utilities.configurations import Config as Cfg
 from ruptura_zero.utilities.merge_how_options import MergeHowOptions
+from ruptura_zero.protocols.transformer import DataCleaningServiceProtocol
 
 
 class Pipeline:
@@ -35,7 +35,7 @@ class Pipeline:
 
     def __init__(self,
                  extractor: ExtractorProtocol,
-                 cleaner: DataCleanerProtocol,
+                 cleaning_service: DataCleaningServiceProtocol,
                  merger: DataMergerProtocol,
                  loader: LoaderProtocol,
                  data_persistence: DataPersistenceProtocol) -> None:
@@ -43,7 +43,7 @@ class Pipeline:
 
         Args:
             extractor (ExcelExtractor): The extractor instance.
-            cleaner (DataCleaner): The cleaner instance.
+            cleaning_service (DataCleaningService): The cleaning service instance.
             merger (DataMerger): The merger instance.
             loader (DataLoader): The loader instance.
             data_persistence (DataPersistence): The data persistence instance.
@@ -57,8 +57,8 @@ class Pipeline:
         # Set the extractor.
         self.extractor = extractor
 
-        # Set the cleaner.
-        self.cleaner = cleaner
+        # Set the cleaning service.
+        self.cleaning_service = cleaning_service
 
         # Set the merger.
         self.merger = merger
@@ -86,45 +86,7 @@ class Pipeline:
 
         logger.info('Limpando e validando todos os conjuntos de dados...')
 
-        cleaned_data = {}
-        for data_cleaning_schema in DATA_CLEANING_SCHEMAS:
-            # Obtendo o DataFrame correspondente ao esquema.
-            data_frame = extracted_data.get(data_cleaning_schema['data_attr'])
-
-            if data_frame is not None:
-                # Renomear colunas com base no esquema.
-                columns_mapping = data_cleaning_schema.get('columns')
-                if columns_mapping:
-                    logger.info(f'Renomeando colunas de {data_cleaning_schema["name"]}...')
-                    data_frame = data_frame.rename(columns=columns_mapping)
-
-                # Aplicando a limpeza de dados.
-                logger.info(f'Limpando dados de {data_cleaning_schema["name"]}...')
-                cleaned_dataframe = self.cleaner.clean(data_frame, data_cleaning_schema['types'])
-
-                # Validação de dados com Pandera.
-                pandera_schema = data_cleaning_schema.get('pandera_schema')
-                if not pandera_schema:
-                    logger.warning(
-                        f'Nenhum esquema Pandera encontrado para {data_cleaning_schema["name"]}. Pulando a validação.')
-                else:
-                    try:
-                        logger.info(f'Validando dados de {data_cleaning_schema["name"]} com Pandera...')
-                        pandera_schema.validate(cleaned_dataframe, lazy=True)
-                        logger.success(f'Validação de {data_cleaning_schema["name"]} bem-sucedida.')
-                    except SchemaError as error:
-                        logger.error(f'Validação de dados para {data_cleaning_schema["name"]} falhou.')
-                        logger.error(f'Causa do erro:\n{error.failure_cases}')
-
-                        raise error
-
-                # Atribuindo o DataFrame limpo de volta ao atributo da classe.
-                cleaned_data[data_cleaning_schema['data_attr']] = cleaned_dataframe
-            else:
-                logger.error(
-                    f'Dados de {data_cleaning_schema["name"].lower()} não foram extraídos corretamente.')
-
-        return cleaned_data
+        return self.cleaning_service.run(extracted_data)
 
     def transform_for_analysis(self, cleaned_data: Mapping[str, pd.DataFrame | None]) -> pd.DataFrame | None:
         """Transform the data for analysis."""
