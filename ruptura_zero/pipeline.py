@@ -16,14 +16,14 @@
 from loguru import logger
 from pandera.errors import SchemaError
 
-from ruptura_zero.extractor.excel_extractor import ExcelExtractor
-from ruptura_zero.loader.data_loader import DataLoader
-from ruptura_zero.transformer.cleaner import DataCleaner
+from ruptura_zero.protocols.data_persistence import DataPersistenceProtocol
+from ruptura_zero.protocols.extractor import ExtractorProtocol
+from ruptura_zero.protocols.loader import LoaderProtocol
+from ruptura_zero.protocols.transformer import (DataCleanerProtocol,
+                                                DataMergerProtocol)
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
-from ruptura_zero.transformer.data_merge import DataMerger
 from ruptura_zero.transformer.pandera_schemas import CONSOLIDATED_SCHEMA
 from ruptura_zero.utilities.configurations import Config as Cfg
-from ruptura_zero.utilities.data_persistence import DataPersistence
 from ruptura_zero.utilities.merge_how_options import MergeHowOptions
 
 
@@ -31,11 +31,11 @@ class Pipeline:
     """Defines the ETL pipeline for the Ruptura Zero project."""
 
     def __init__(self,
-                 extractor: ExcelExtractor,
-                 cleaner: DataCleaner,
-                 merger: DataMerger,
-                 loader: DataLoader,
-                 data_persistence: DataPersistence) -> None:
+                 extractor: ExtractorProtocol,
+                 cleaner: DataCleanerProtocol,
+                 merger: DataMergerProtocol,
+                 loader: LoaderProtocol,
+                 data_persistence: DataPersistenceProtocol) -> None:
         """Initialize the Pipeline.
 
         Args:
@@ -183,4 +183,4 @@ class Pipeline:
         logger.info('Carregando os dados para o MotherDuck...')
 
         # Carregando os dados consolidados para o MotherDuck.
-        self.loader.load_data_to_motherduck(self.ruptura_estoque_vendas_data)
+        self.loader.load_data(self.ruptura_estoque_vendas_data, to_motherduck=True)
