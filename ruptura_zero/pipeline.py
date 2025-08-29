@@ -126,9 +126,7 @@ class Pipeline:
 
         return cleaned_data
 
-    def transform_for_analysis(self,
-                               cleaned_data: Mapping[str, pd.DataFrame | None]
-                               ) -> pd.DataFrame | None:
+    def transform_for_analysis(self, cleaned_data: Mapping[str, pd.DataFrame | None]) -> pd.DataFrame | None:
         """Transform the data for analysis."""
 
         logger.info('Transformando os dados para análise...')

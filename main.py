@@ -16,55 +16,19 @@
 
 from loguru import logger
 
-from ruptura_zero.extractor.excel_extractor import ExcelExtractor
-from ruptura_zero.loader.data_loader import DataLoader
-from ruptura_zero.manager import PipelineManager
-from ruptura_zero.pipeline import Pipeline
-from ruptura_zero.transformer.cleaner import DataCleaner
-from ruptura_zero.transformer.data_merge import DataMerger
-from ruptura_zero.utilities.configurations import Config as Cfg
-from ruptura_zero.utilities.data_persistence import DataPersistence
+from ruptura_zero.factory import build_application
 
 
-def main(pipeline_manager: PipelineManager) -> None:
-    """Run the main ETL pipeline.
+def main() -> None:
+    """Run the main ETL pipeline."""
 
-    This function orchestrates the ETL process by calling the appropriate methods
-    on the PipelineManager instance.
-
-    Args:
-        pipeline_manager (PipelineManager): The pipeline manager instance.
-    """
+    logger.info('Ruptura Zero: Análise de Vendas e Estoques.')
 
     # Run the ETL pipeline.
+    pipeline_manager = build_application()
     pipeline_manager.run_pipeline()
 
 
 if __name__ == "__main__":
     # Starting the ETL process.
-    logger.info('Ruptura Zero: Análise de Vendas e Estoques...')
-    logger.info('Iniciando o processo ETL...')
-
-    # Create an ExcelExtractor instance.
-    extractor = ExcelExtractor(Cfg.RAW_DATA.value / Cfg.RAW_DATA_FILE.value)
-
-    # Create a DataCleaner instance.
-    cleaner = DataCleaner()
-
-    # Create a DataMerger instance.
-    merger = DataMerger()
-
-    # Create a DataPersistence instance.
-    data_persistence = DataPersistence()
-
-    # Create a DataLoader instance.
-    loader = DataLoader()
-
-    # Create a Pipeline instance.
-    pipeline = Pipeline(extractor, cleaner, merger, loader, data_persistence)
-
-    # Create a PipelineManager instance.
-    pipeline_manager = PipelineManager(pipeline)
-
-    # Run the main function.
-    main(pipeline_manager)
+    main()
