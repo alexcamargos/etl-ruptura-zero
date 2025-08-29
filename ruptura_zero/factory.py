@@ -20,9 +20,11 @@ from ruptura_zero.loader.data_loader import DataLoader
 from ruptura_zero.manager import PipelineManager
 from ruptura_zero.pipeline import Pipeline
 from ruptura_zero.services.data_cleaning_service import DataCleaningService
+from ruptura_zero.services.data_transforming_service import DataTransformingService
 from ruptura_zero.transformer.cleaner import DataCleaner
 from ruptura_zero.transformer.data_cleaning_schemas import DATA_CLEANING_SCHEMAS
 from ruptura_zero.transformer.data_merge import DataMerger
+from ruptura_zero.transformer.pandera_schemas import CONSOLIDATED_SCHEMA
 from ruptura_zero.utilities.configurations import Config as Cfg
 from ruptura_zero.utilities.data_persistence import DataPersistence
 
@@ -44,24 +46,27 @@ def build_application():
     logger.info('Criando o serviço de limpeza de dados...')
     cleaning_service = DataCleaningService(cleaner, DATA_CLEANING_SCHEMAS)
 
+    # Create a DataPersistence instance.
+    logger.info('Criando o persistente de dados...')
+    data_persistence = DataPersistence()
+
     # Create a DataMerger instance.
     logger.info('Criando o consolidador de dados...')
     merger = DataMerger()
+
+    # Criando o serviço de transformação de dados.
+    logger.info('Criando o serviço de transformação de dados...')
+    transforming_service = DataTransformingService(merger, data_persistence, CONSOLIDATED_SCHEMA)
 
     # Create a DataLoader instance.
     logger.info('Criando o carregador de dados...')
     loader = DataLoader()
 
-    # Create a DataPersistence instance.
-    logger.info('Criando o persistente de dados...')
-    data_persistence = DataPersistence()
-
     # Create a Pipeline instance.
     logger.info('Criando o pipeline...')
     pipeline = Pipeline(extractor,
                         cleaning_service,
-                        merger,
-                        loader,
-                        data_persistence)
+                        transforming_service,
+                        loader)
 
     return PipelineManager(pipeline)
