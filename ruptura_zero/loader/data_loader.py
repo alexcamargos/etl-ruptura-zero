@@ -23,6 +23,11 @@ from loguru import logger
 
 class DataLoader:
     def __init__(self, table_name: str = 'ruptura_zero_analysis') -> None:
+        """Initialize the DataLoader.
+
+        Args:
+            table_name (str): The name of the table to load data into.
+        """
 
         self.table_name = table_name
 
@@ -46,7 +51,11 @@ class DataLoader:
         self.token = motherduck_token
 
     def load_data_to_motherduck(self, data: pd.DataFrame) -> None:
-        """Load data into MotherDuck."""
+        """Load data into MotherDuck.
+
+        Args:
+            data (pd.DataFrame): The data to load into MotherDuck.
+        """
 
         try:
             logger.info('Estabelecendo conexão com o MotherDuck...')
