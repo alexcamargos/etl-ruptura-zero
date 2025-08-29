@@ -50,7 +50,7 @@ class DataLoader:
 
         self.token = motherduck_token
 
-    def load_data_to_motherduck(self, data: pd.DataFrame) -> None:
+    def _load_data_to_motherduck(self, data: pd.DataFrame) -> None:
         """Load data into MotherDuck.
 
         Args:
@@ -78,3 +78,16 @@ class DataLoader:
         except db.Error as error:
             logger.error(f'Ocorreu um erro ao carregar os dados para o MotherDuck: {error}')
             raise
+
+    def load_data(self, data: pd.DataFrame, to_motherduck: bool = True) -> None:
+        """Load data into the specified destination.
+
+        Args:
+            data (pd.DataFrame): The data to load.
+            to_motherduck (bool): Whether to load data into MotherDuck.
+        """
+
+        if to_motherduck:
+            self._load_data_to_motherduck(data)
+        else:
+            logger.warning('Carregamento de dados para o destino não suportado.')
