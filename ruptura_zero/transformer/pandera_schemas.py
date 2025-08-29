@@ -13,8 +13,6 @@
 #  License: MIT
 # ------------------------------------------------------------------------------
 
-import re
-
 import pandera.pandas as pa
 
 # Esquema de validação para os dados de ruptura.
