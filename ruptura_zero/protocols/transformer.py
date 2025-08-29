@@ -34,6 +34,13 @@ class DataCleaningServiceProtocol(Protocol):
         raise NotImplementedError('You should implement this method.')
 
 
+class DataTransformingServiceProtocol(Protocol):
+    """Protocol for data transformation services."""
+
+    def run(self, cleaned_data: Mapping[str, pd.DataFrame | None]) -> pd.DataFrame | None:
+        raise NotImplementedError('You should implement this method.')
+
+
 class DataMergerProtocol(Protocol):
     """Protocol for data mergers."""
 
