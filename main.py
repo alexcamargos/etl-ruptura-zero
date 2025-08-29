@@ -17,6 +17,7 @@
 from loguru import logger
 
 from ruptura_zero.extractor.excel_extractor import ExcelExtractor
+from ruptura_zero.loader.data_loader import DataLoader
 from ruptura_zero.manager import PipelineManager
 from ruptura_zero.pipeline import Pipeline
 from ruptura_zero.transformer.cleaner import DataCleaner
@@ -65,8 +66,11 @@ if __name__ == "__main__":
     # Create a DataPersistence instance.
     data_persistence = DataPersistence()
 
+    # Create a DataLoader instance.
+    loader = DataLoader()
+
     # Create a Pipeline instance.
-    pipeline = Pipeline(extractor, cleaner, merger, data_persistence)
+    pipeline = Pipeline(extractor, cleaner, merger, loader, data_persistence)
 
     # Create a PipelineManager instance.
     pipeline_manager = PipelineManager(pipeline)
