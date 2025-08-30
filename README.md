@@ -44,7 +44,7 @@ Este pipeline automatiza a extração de dados brutos de vendas e estoque de arq
 
 
 ## 🏛️ Arquitetura e Padrões
-O projeto foi estruturado seguindo o padrão **ETL (Extract, Transform, Load)** para garantir um fluxo de dados claro e manutenível.
+O projeto segue um fluxo de dados desacoplado, utilizando o padrão Factory para orquestrar as etapas de Extração, Transformação e Carga, garantindo manutenibilidade e escalabilidade.
 
 - **/ruptura_zero/extractor**: Módulos responsáveis pela extração de dados de fontes externas (ex: planilhas Excel).
 - **/ruptura_zero/transformer**: Contém a lógica de negócio para limpeza, transformação e validação dos dados. Utiliza **Pandera** para definir e aplicar esquemas de validação, garantindo a robustez do pipeline.
