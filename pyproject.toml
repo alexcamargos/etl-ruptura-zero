@@ -13,7 +13,7 @@ authors = [
 ]
 description = "Análise de dados de vendas e estoque para identificar as causas da ruptura e gerar insights para otimização do negócio."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = ["data analysis", "etl", "sales", "inventory", "business intelligence"]
 classifiers = [
