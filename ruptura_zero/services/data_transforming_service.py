@@ -17,7 +17,7 @@ from typing import Mapping
 
 import pandas as pd
 from loguru import logger
-import pandera as pa
+import pandera.pandas as pa
 from pandera.errors import SchemaError
 
 from ruptura_zero.protocols.data_persistence import DataPersistenceProtocol

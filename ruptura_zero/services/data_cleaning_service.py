@@ -16,6 +16,7 @@
 from typing import Mapping
 
 import pandas as pd
+import pandera.pandas as pa
 from loguru import logger
 from pandera.errors import SchemaError
 
@@ -25,12 +26,12 @@ from ruptura_zero.protocols.transformer import DataCleanerProtocol
 class DataCleaningService:
     """Service for cleaning and validating extracted data."""
 
-    def __init__(self, cleaner: DataCleanerProtocol, data_cleaning_schemas: list[dict]):
+    def __init__(self, cleaner: DataCleanerProtocol, data_cleaning_schemas: list[dict]) -> None:
         """Initialize the data cleaning service.
 
         Args:
             cleaner (DataCleanerProtocol): The data cleaner instance.
-            data_cleaning_schemas (list[dict]): The list of data cleaning schemas.
+            data_cleaning_schemas (list[dict]): The schema to be used for data cleaning.
         """
 
         self.cleaner = cleaner
