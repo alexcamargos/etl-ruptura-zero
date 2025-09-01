@@ -5,8 +5,7 @@
 #  Name: main.py
 #  Version: 0.0.1
 #
-#  Summary: Project Name
-#           Quick description of the project.
+#  Summary: Ruptura Zero: Análise de Vendas e Estoque
 #
 #  Author: Alexsander Lopes Camargos
 #  Author-email: alcamargos@vivaldi.net
