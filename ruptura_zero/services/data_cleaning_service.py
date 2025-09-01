@@ -16,7 +16,6 @@
 from typing import Mapping
 
 import pandas as pd
-import pandera.pandas as pa
 from loguru import logger
 from pandera.errors import SchemaError
 
